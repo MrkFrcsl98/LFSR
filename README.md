@@ -1,5 +1,7 @@
 # LFSR
 
+![My Image](https://github.com/MrkFrcsl98/LFSR/blob/main/lfsr-1-x-x-3-l-2969025070.jpg?raw=true)
+
 One of the most important component within stream ciphers is the LFSR, the LFSR consists of a shift register of length "n" and a linear feedback function.
 The Shift Register holds a sequence of bits, and at each clock cycle the bits are shifted to the right, and a new bit is introduced at the leftmost position,
 this new bit is a linear function of the bits currently in the register. The Feedback function in an LFSR is typically a linear function, meaning it can be
