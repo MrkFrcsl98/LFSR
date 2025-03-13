@@ -18,3 +18,5 @@ that the output keystream is not predictable. The keystream generation process i
 Specifically, each LFSR is clocked based on the majority value of certain designated bits in the 3 registers. The majority rule mechanism introduces 
 non-linearity, making it more challenging for an attacker to predict the keystream. Using single LFSR can introduce several vulnerabilities from different 
 type of attacks such as correlation and algebraic attacks.
+
+![My Image](https://github.com/MrkFrcsl98/LFSR/blob/main/image-20210722193429960-2903233593.png?raw=true)
