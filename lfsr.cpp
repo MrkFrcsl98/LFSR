@@ -125,7 +125,7 @@ int main()
         for (std::uint32_t cycle{0}; cycle <= CYCLE_THRESHOLD; ++cycle)
         {
 
-            //std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
             std::cout << cycle << "/" << CYCLE_THRESHOLD << ") " << (int)tap_A << " " << (int)tap_B << " = ";
             for(int i = 0; i < SEQ_SZ; ++i) {
                 std::cout << (int)bit_sequence[i];
@@ -195,19 +195,6 @@ int main()
 
         finalizeSequenceStateStream();
         std::cout << "Feedback Map Size = " << StateMap.size() << "\n";
-
-        // for (auto &[k, v] : StateMap)
-        // {
-        //     for (std::size_t i{0}; i < v.clock_sequence.size(); ++i)
-        //     {
-        //         std::cout << "Sequence: ";
-        //         for (std::size_t j{0}; j < v.clock_sequence[i].size(); ++j)
-        //         {
-        //             std::cout << v.clock_sequence[i][j];
-        //         }
-        //         std::cout << "\n";
-        //     }
-        // }
 
         std::cout << "Calculated Stream Output: " << output_stream << "\n";
     }
