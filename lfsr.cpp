@@ -12,6 +12,12 @@
 #include <unordered_set>
 #include <vector>
 
+#ifndef LFSR_BIT_INIT 
+#define LFSR_BIT_INIT 0x0af0 // (2800)
+#endif
+
+#define __improved_exec __attribute__((hot, always_inline, no_stack_protector))
+
 typedef std::uint64_t tBit;
 
 typedef struct
@@ -20,13 +26,14 @@ typedef struct
     std::vector<std::vector<tBit>> clock_sequence{};
     std::uint8_t tA{};
     std::uint8_t tB{};
+
 } SequenceStates;
 
 std::unordered_map<std::size_t, SequenceStates> StateMap;
 
 std::uint64_t output_stream{0};
 
-__attribute__((hot, always_inline)) inline static void registerFeedback(const std::uint8_t _f, const std::size_t _seqSZ,
+__improved_exec inline static void registerFeedback(const std::uint8_t _f, const std::size_t _seqSZ,
                              const std::uint8_t t_a, const std::uint8_t t_b)
 {
     if (StateMap.find(_seqSZ) != StateMap.end())
@@ -45,27 +52,27 @@ __attribute__((hot, always_inline)) inline static void registerFeedback(const st
 
 __attribute__((cold)) static void finalizeSequenceStateStream()
 {
-    if (StateMap.size() > 0)
+    if (StateMap.size() > 0x0)
     {
         for (auto &[dx, state] : StateMap)
         {
-            while (state.block_stream.size() % 8 != 0)
+            while (state.block_stream.size() % 0x8 != 0x0)
             {
                 state.block_stream.push_back(0);
             }
         }
-        for (std::size_t s{0}; s < StateMap.size(); ++s)
+        for (std::size_t s{0x0}; s < StateMap.size(); ++s)
         {
             for (auto &[k, s] : StateMap)
             {
-                for (std::size_t c{0}; c < s.block_stream.size(); c += 8)
+                for (std::size_t c{0x0}; c < s.block_stream.size(); c += 0x8)
                 {
                     std::string str("");
-                    for (int i = 0; i < 8; ++i)
+                    for (int i = 0x0; i < 0x8; ++i)
                     {
                         str += std::to_string(s.block_stream[i + c]);
                     }
-                    std::bitset<8> bits(str);
+                    std::bitset<0x8> bits(str);
                     output_stream += bits.to_ullong();
                 }
             }
@@ -73,7 +80,7 @@ __attribute__((cold)) static void finalizeSequenceStateStream()
     }
 };
 
-__attribute__((hot, always_inline, no_stack_protector)) inline static void registerClockSequence(const std::size_t _seqSZ, const std::vector<tBit> &_sequence)
+__improved_exec inline static void registerClockSequence(const std::size_t _seqSZ, const std::vector<tBit> &_sequence)
 {
     if (StateMap.find(_seqSZ) != StateMap.end())
     {
@@ -81,16 +88,16 @@ __attribute__((hot, always_inline, no_stack_protector)) inline static void regis
     }
 };
 
-__attribute__((hot, always_inline)) inline static const bool collisionDetection(const std::vector<tBit>& _seq)  {
+__improved_exec inline static const bool collisionDetection(const std::vector<tBit>& _seq)  {
     bool is = false;
     try{
-        if(StateMap.size() > 0) [[likely]] {
-            for(auto&[k, v]: StateMap){
-                for(int i = 0; i < v.block_stream.size() && i < _seq.size(); ++i){
+        if(StateMap.size() > 0x0) [[likely]] {
+            for(const auto&[k, v]: StateMap){
+                for(int i = 0x0; i < v.block_stream.size() && i < _seq.size(); ++i){
                     if(_seq[i] != v.block_stream[i]) {
                         is = false;
                         break;
-                    }else if(i == _seq.size() - 1) [[unlikely]] {
+                    }else if(i == _seq.size() - 0x1) [[unlikely]] {
                         is = true;
                     }
                 }
@@ -102,44 +109,46 @@ __attribute__((hot, always_inline)) inline static const bool collisionDetection(
     return is;
 };
 
-int main()
+int main(int argc, char** argv)
 {
     try
     {
-        constexpr std::uint16_t initial_state = 4238u;
-        constexpr std::uint8_t INITIAL_SEED_SIZE{sizeof(initial_state) * 8};
-        std::vector<std::uint64_t> bit_sequence(INITIAL_SEED_SIZE, 0);
+        std::size_t collisions{0};
+        constexpr std::uint16_t initial_state = LFSR_BIT_INIT;
+        constexpr std::uint8_t INITIAL_SEED_SIZE{sizeof(initial_state) * 0x8};
+        std::vector<std::uint64_t> bit_sequence(INITIAL_SEED_SIZE, 0x0);
         std::bitset<INITIAL_SEED_SIZE> initBits(initial_state);
-        for (int i = 0; i < bit_sequence.size(); ++i)
+        for (int i = 0x0; i < bit_sequence.size(); ++i)
         {
             bit_sequence[i] = initBits[i];
         }
         std::uint16_t SEQ_SZ = bit_sequence.size();
-        std::uint8_t tap_A = 0, tap_B = SEQ_SZ - 1;
+        std::uint8_t tap_A = 0x0, tap_B = SEQ_SZ - 0x1;
 
-        const std::uint64_t CYCLE_THRESHOLD = static_cast<std::uint64_t>(std::pow(2, bit_sequence.size()) * 129);
+        const std::uint64_t CYCLE_THRESHOLD = static_cast<std::uint64_t>(std::pow(0x2, bit_sequence.size()));
 
         std::cout << "Using initial state: " << (int)initial_state << "\n";
 
         // try for all possible intervals available
-        for (std::uint32_t cycle{0}; cycle <= CYCLE_THRESHOLD; ++cycle)
+        for (std::uint32_t cycle{0x0}; cycle <= CYCLE_THRESHOLD; ++cycle)
         {
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(0x1));
             std::cout << cycle << "/" << CYCLE_THRESHOLD << ") " << (int)tap_A << " " << (int)tap_B << " = ";
-            for(int i = 0; i < SEQ_SZ; ++i) {
+            for(int i = 0x0; i < SEQ_SZ; ++i) {
                 std::cout << (int)bit_sequence[i];
             }
             std::cout << "\n";
 
             // collision detection block
             if(collisionDetection(bit_sequence)) {
+                ++collisions;
                 std::cout << "Collision Detected: " << cycle << "/" << CYCLE_THRESHOLD << ") " << (int)tap_A << " " << (int)tap_B << " = ";
-                for(int i = 0; i < bit_sequence.size(); ++i){
+                for(int i{0x0}; i < bit_sequence.size(); ++i){
                     std::cout << bit_sequence[i];
                 }
                 std::cout << "\n";
-                std::this_thread::sleep_for(std::chrono::seconds(3));
+                //std::this_thread::sleep_for(std::chrono::seconds(3));
             }
 
             registerClockSequence(SEQ_SZ, bit_sequence); // register current clock sequence
@@ -147,15 +156,15 @@ int main()
                 bit_sequence[tap_A] ^ bit_sequence[tap_B]; // save feedback state
 
             // register right shift
-            for (std::uint16_t i{SEQ_SZ}; i >= 0;)
+            for (std::uint16_t i{SEQ_SZ}; i >= 0x0;)
             {
-                if (--i <= 0)
+                if (--i <= 0x0)
                 {
                     break;
                 }
                 else
                 {
-                    bit_sequence[i] = bit_sequence[i - 1];
+                    bit_sequence[i] = bit_sequence[i - 0x1];
                 }
             }
 
@@ -163,25 +172,25 @@ int main()
             registerFeedback(feedback, SEQ_SZ, tap_A, tap_B); // register feedback
 
             // switch tap positions
-            if (cycle >= CYCLE_THRESHOLD - 1)
+            if (cycle >= CYCLE_THRESHOLD - 0x1)
             {
                 bit_sequence.clear();
                 std::cout << "Old State: " << initBits.to_string() << "\n";
                 initBits |= (tap_A + tap_B);
                 initBits <<= 1;
                 std::cout << "Using new State: " << initBits.to_string() << "\n";
-                std::this_thread::sleep_for(std::chrono::seconds(4));
-                for (int i = 0; i < bit_sequence.size(); ++i)
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                for (int i{0x0}; i < bit_sequence.size(); ++i)
                 {
                     bit_sequence[i] = initBits[i];
                 }
                 if (tap_A < SEQ_SZ - 1)
                 {
-                    if(++tap_A % tap_B == 0) {
+                    if(++tap_A % tap_B == 0x0) {
                         --tap_B;
                     } 
                 }
-                else if (tap_B > 0)
+                else if (tap_B > 0x0)
                 {
                     --tap_B;
                 }
@@ -189,7 +198,7 @@ int main()
                 {
                     break;
                 }
-                cycle = 0;
+                cycle = 0x0;
             }
         }
 
@@ -197,6 +206,8 @@ int main()
         std::cout << "Feedback Map Size = " << StateMap.size() << "\n";
 
         std::cout << "Calculated Stream Output: " << output_stream << "\n";
+
+        std::cout << "Total Collisions: " << collisions << "\n";
     }
     catch (const std::invalid_argument &e)
     {
@@ -210,5 +221,5 @@ int main()
     {
         std::cerr << "Exception: " << e.what() << "\n";
     }
-    return 0;
+    return 0x0;
 }
