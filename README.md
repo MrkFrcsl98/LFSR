@@ -2,6 +2,8 @@
 
 ![My Image](https://github.com/MrkFrcsl98/LFSR/blob/main/329r0iewopeiqwoewqe.jpg?raw=true)
 
+![My Image](https://github.com/MrkFrcsl98/LFSR/blob/main/dfewrewipriewirewrewrw.jpg?raw=true)
+
 One of the most important component within stream ciphers is the LFSR, the LFSR consists of a shift register of length "n" and a linear feedback function.
 The Shift Register holds a sequence of bits, and at each clock cycle the bits are shifted to the right, and a new bit is introduced at the leftmost position,
 this new bit is a linear function of the bits currently in the register. The Feedback function in an LFSR is typically a linear function, meaning it can be
@@ -19,4 +21,3 @@ Specifically, each LFSR is clocked based on the majority value of certain design
 non-linearity, making it more challenging for an attacker to predict the keystream. Using single LFSR can introduce several vulnerabilities from different 
 type of attacks such as correlation and algebraic attacks.
 
-![My Image](https://github.com/MrkFrcsl98/LFSR/blob/main/image-20210722193429960-2903233593.png?raw=true)
